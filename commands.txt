@@ -1,0 +1,95 @@
+=============================================================
+  Heavy Emerald — Команды для GitHub (версия 1.0.3)
+=============================================================
+
+--- 1. КОММИТ КОДА В ПРИВАТНЫЙ РЕПОЗИТОРИЙ ------------------
+
+# Перейди в папку проекта
+cd C:\vps-emerald\vps-emerald
+
+# Добавь все изменения
+git add .
+
+# Сделай коммит
+git commit -m "Release v1.0.3"
+
+# Создай тег версии
+git tag -a v1.0.3 -m "Release v1.0.3"
+
+# Подключи удалённый репозиторий (только при первой настройке)
+# Замени YOUR_USERNAME на свой ник на GitHub
+git remote add origin https://github.com/YOUR_USERNAME/heavy-emerald-vpn.git
+
+# Загрузи код на GitHub
+git push -u origin master
+git push origin v1.0.3
+
+--- 2. СБОРКА WINDOWS (если ещё не собрано) ------------------
+
+# Очисти старую сборку и собери заново (с обфускацией строк)
+flutter clean
+flutter build windows --obfuscate --split-debug-info=symbols
+
+# Примени admin manifest (запускай в CMD, не в PowerShell)
+"C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\mt.exe" ^
+  -manifest "vps_emerald_app\windows\runner\resources\admin.manifest" ^
+  -outputresource:"vps_emerald_app\build\windows\x64\runner\Release\HeavyEmerald.exe;1"
+
+--- 3. СОЗДАНИЕ ZIP-АРХИВА -----------------------------------
+
+# Запусти PowerShell и выполни:
+Compress-Archive -Path "vps_emerald_app\build\windows\x64\runner\Release\HeavyEmerald.exe", `
+  "vps_emerald_app\build\windows\x64\runner\Release\*.dll", `
+  "vps_emerald_app\build\windows\x64\runner\Release\data" `
+  -DestinationPath "HeavyEmerald-Windows-x64.zip" -Force
+
+# Или просто скопируй готовый ZIP на рабочий стол:
+copy "HeavyEmerald-Windows-x64.zip" "C:\Users\%USERNAME%\Desktop\heavy-emerald-vpn-releases\"
+
+--- 4. ЗАГРУЗКА ZIP В РЕПО РЕЛИЗОВ ---------------------------
+
+# Перейди в папку релизов на рабочем столе
+cd C:\Users\%USERNAME%\Desktop\heavy-emerald-vpn-releases
+
+# Если папки нет — создай и клонируй репо:
+# git clone https://github.com/YOUR_USERNAME/heavy-emerald-vpn-releases.git
+
+copy "C:\vps-emerald\vps-emerald\HeavyEmerald-Windows-x64.zip" .
+
+git add HeavyEmerald-Windows-x64.zip
+git commit -m "Add v1.0.3 Windows release"
+git push origin main
+
+--- 5. СОЗДАНИЕ РЕЛИЗА НА GITHUB -----------------------------
+
+# Вариант A: через GitHub CLI (gh)
+gh release create v1.0.3 ^
+  --repo YOUR_USERNAME/heavy-emerald-vpn-releases ^
+  --title "Heavy Emerald v1.0.3" ^
+  --notes "Исправления:
+- Процесс sing-box теперь корректно завершается при отключении VPN
+- Группировка серверов по локациям в импорте подписок
+- Обновлён FAQ с информацией о поддерживаемых форматах подписок
+- Версия 1.0.3" ^
+  HeavyEmerald-Windows-x64.zip
+
+# Вариант B: через сайт GitHub
+# 1. Открой https://github.com/YOUR_USERNAME/heavy-emerald-vpn-releases/releases
+# 2. Нажми "Draft a new release"
+# 3. Выбери тег: v1.0.3
+# 4. Заголовок: Heavy Emerald v1.0.3
+# 5. Описание: скопируй текст выше
+# 6. Загрузи HeavyEmerald-Windows-x64.zip
+# 7. Нажми "Publish release"
+
+=============================================================
+  ВАЖНЫЕ ЗАМЕТКИ
+=============================================================
+
+- Замени YOUR_USERNAME на свой ник на GitHub.
+- Приватный репозиторий (heavy-emerald-vpn) — для исходного кода.
+- Публичный репозиторий (heavy-emerald-vpn-releases) — для ZIP-файлов.
+- Admin manifest нужен для создания TUN-адаптера на Windows.
+- Если git ещё не настроен — сначала выполни:
+    git config --global user.name "Твоё Имя"
+    git config --global user.email "твой@email.com"
